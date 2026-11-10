@@ -1,0 +1,36 @@
+{
+  "name": "pia-pia-piano",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "agent-playground dev",
+    "dev:server": "concurrently --kill-others --names widget,next \"vite build --watch\" \"next dev --port ${PORT:-3200}\"",
+    "build:widget": "vite build",
+    "build": "pnpm build:widget && pnpm typecheck && next build",
+    "start": "next start",
+    "typecheck": "next typegen && tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/ext-apps": "^2.0.0",
+    "@modelcontextprotocol/server": "^2.0.0",
+    "mcp-handler": "^2.2.0",
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@enkind/agent-playground": "^0.1.1",
+    "@rolldown/binding-darwin-arm64": "1.2.18",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6.1.1",
+    "concurrently": "^10.0.5",
+    "typescript": "^5",
+    "vite": "^8.3.0",
+    "vite-plugin-singlefile": "^2.3.3"
+  },
+  "packageManager": "pnpm@9.6.0"
+}

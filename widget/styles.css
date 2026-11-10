@@ -1,0 +1,100 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font: 13px/1.4 system-ui, sans-serif;
+  color: #1c1b19;
+  background: transparent;
+}
+
+.piano {
+  padding: 12px;
+}
+
+.piano header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.piano header button {
+  font: inherit;
+  padding: 4px 10px;
+  border: 1px solid #c9c6bf;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.keys {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--white-count), 1fr);
+  height: 180px;
+  touch-action: none;
+  user-select: none;
+}
+
+.keys button {
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.white {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 8px !important;
+  background: #fbfaf7;
+  border: 1px solid #c9c6bf !important;
+  border-radius: 0 0 6px 6px;
+  color: #8a867d;
+  font-size: 11px;
+}
+
+.black {
+  position: absolute;
+  top: 0;
+  width: calc(100% / var(--white-count) * 0.6);
+  height: 60%;
+  left: calc(100% / var(--white-count) * (var(--after) + 1) - 100% / var(--white-count) * 0.3);
+  background: #1c1b19;
+  border-radius: 0 0 4px 4px;
+}
+
+.white[data-pressed] {
+  background: #ffd76a;
+}
+
+.black[data-pressed] {
+  background: #b8860b;
+}
+
+dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 16px;
+  margin: 12px 0 0;
+  font-size: 11px;
+}
+
+dl div {
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+}
+
+dt {
+  color: #8a867d;
+  white-space: nowrap;
+}
+
+dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}

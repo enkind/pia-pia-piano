@@ -1,0 +1,16 @@
+{
+  "name": "pia-pia-piano",
+  "version": "0.0.0",
+  "description": "A playable piano in the conversation, so a song the agent knows can be played rather than read.",
+  "license": "MIT",
+  "keywords": ["mcp", "mcp-apps", "piano", "music"],
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Pia Pia Piano (Dev)",
+    "shortDescription": "Play the song instead of reading the notes",
+    "longDescription": "Pia Pia Piano opens a piano keyboard in the conversation that you can play by tapping the keys.",
+    "category": "Productivity",
+    "capabilities": ["Piano"],
+    "defaultPrompt": ["Open a piano"]
+  }
+}

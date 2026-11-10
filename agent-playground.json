@@ -1,0 +1,24 @@
+{
+  "$schema": "./node_modules/@enkind/agent-playground/schema/config.schema.json",
+  "agent": "codex",
+  "codex": { "cli": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex" },
+  "before": ["pnpm build:widget"],
+  "services": [
+    {
+      "name": "Pia Pia Piano MCP",
+      "command": "pnpm dev:server",
+      "env": { "PORT": "3200", "NEXT_TELEMETRY_DISABLED": "1" },
+      "readyUrl": "http://127.0.0.1:3200/mcp"
+    }
+  ],
+  "collection": {
+    "plugins": [
+      {
+        "path": "./plugins/pia-pia-piano",
+        "mcpServers": {
+          "piano": { "type": "http", "url": "http://127.0.0.1:3200/mcp" }
+        }
+      }
+    ]
+  }
+}
