@@ -1,16 +1,31 @@
 {
   "name": "pia-pia-piano",
   "version": "0.0.0",
-  "description": "A playable piano in the conversation, so a song the agent knows can be played rather than read.",
+  "description": "A playable piano in the conversation, set up to teach one song: the next key lights up and waits for you.",
+  "author": {
+    "name": "dzhunka"
+  },
   "license": "MIT",
-  "keywords": ["mcp", "mcp-apps", "piano", "music"],
+  "keywords": ["mcp", "mcp-apps", "piano", "music", "learn"],
+  "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "Pia Pia Piano (Dev)",
-    "shortDescription": "Play the song instead of reading the notes",
-    "longDescription": "Pia Pia Piano opens a piano keyboard in the conversation that you can play by tapping the keys.",
+    "shortDescription": "Play the song instead of reading its notes",
+    "longDescription": "Ask how a song goes, and Pia Pia Piano opens a piano in the conversation with the melody lined up. The next key lights up and waits until you press it, so you can play the song at your own pace without reading music.",
+    "developerName": "dzhunka",
     "category": "Productivity",
     "capabilities": ["Piano"],
-    "defaultPrompt": ["Open a piano"]
+    "defaultPrompt": [
+      "How does Twinkle Twinkle Little Star go on piano?",
+      "Teach me the Ode to Joy melody"
+    ],
+    "websiteURL": "https://pia-pia-piano.vercel.app",
+    "privacyPolicyURL": "https://pia-pia-piano.vercel.app/privacy",
+    "termsOfServiceURL": "https://pia-pia-piano.vercel.app/terms",
+    "brandColor": "#121317",
+    "composerIcon": "./pia-pia-piano.svg",
+    "logo": "./pia-pia-piano.svg",
+    "logoDark": "./pia-pia-piano-dark.svg"
   }
 }

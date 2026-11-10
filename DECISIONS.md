@@ -60,3 +60,46 @@ the user plays every note.
 - A host that blocks Web Audio even after a gesture.
 - Cursor or a mobile host offering fullscreen, or a mobile host where the
   keyboard cannot fit in portrait.
+
+## 002 — The user is the clock: a melody of pitches, no durations
+
+**Date:** 2026-11-10
+**Status:** Accepted
+
+### Context
+
+A song on a keyboard can be taught three ways. Falling notes, as in rhythm
+games, need tempo, durations, timing windows, and vertical room the inline
+card does not have, and they punish a beginner for being slow. A play-along
+that sounds the song at tempo needs durations from the agent and a transport.
+A wait-for-me piano lights the next key and does nothing until it is pressed.
+
+### Decision
+
+Wait for the user. The tool takes `{ title, notes }`, each note a `pitch` in
+scientific pitch notation with an optional `lyric` syllable. There are no
+durations, rests, chords, or tempo, because none of them carries information
+when the user sets the pace. A wrong key still sounds, flashes red, and leaves
+the lit key where it is.
+
+The keyboard shows the song's range widened to whole white keys and padded to
+at least an octave. The server refuses a melody wider than three octaves, so
+every key stays wide enough to hit in an inline card, and refuses any pitch it
+cannot parse, both with a reason the agent can fix. `lib/song.ts` is the one
+definition of a playable song, used by both the server and the widget.
+
+Presses are judged inside a reducer against the state at the moment of each
+press, not against the last render, so two keys pressed within one frame are
+still scored in order.
+
+### Consequences
+
+Agents write less and get it wrong less: a melody is a list of note names.
+The piano cannot teach rhythm, and a song whose identity is its rhythm will be
+recognisable only to someone who already knows it.
+
+### What would reopen this
+
+- People asking to hear the song before playing it, which would bring back
+  optional durations and a Listen button.
+- Songs that need both hands, which would mean chords and a second lit colour.

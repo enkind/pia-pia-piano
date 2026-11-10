@@ -1,5 +1,10 @@
 import { useSyncExternalStore } from "react";
-import { App, type McpUiHostContext } from "@modelcontextprotocol/ext-apps";
+import {
+  App,
+  applyDocumentTheme,
+  type McpUiHostContext,
+} from "@modelcontextprotocol/ext-apps";
+import type { Song } from "../lib/song";
 import { version } from "../package.json";
 
 // The host establishes one bridge per iframe, so the `App` lives at module
@@ -10,19 +15,37 @@ const app = new App(
   { autoResize: true },
 );
 
-let hostContext: McpUiHostContext | undefined;
+type State = { context?: McpUiHostContext; song?: Song };
+
+let state: State = {};
 const listeners = new Set<() => void>();
 
-function update() {
-  hostContext = app.getHostContext();
+function set(next: Partial<State>) {
+  state = { ...state, ...next };
   for (const listener of listeners) listener();
 }
 
-app.onhostcontextchanged = update;
+function adoptContext() {
+  const context = app.getHostContext();
+  if (context?.theme) applyDocumentTheme(context.theme);
+  set({ context });
+}
+
+/** The song arrives as the tool's arguments, and again echoed in its result. */
+function adoptSong(value: unknown) {
+  const song = value as Partial<Song> | undefined;
+  if (typeof song?.title === "string" && Array.isArray(song.notes)) {
+    set({ song: { title: song.title, notes: song.notes } });
+  }
+}
+
+app.ontoolinput = (params) => adoptSong(params.arguments);
+app.ontoolresult = (result) => adoptSong(result.structuredContent);
+app.onhostcontextchanged = adoptContext;
 app.onerror = (error) => console.error("[mcp-app] error:", error);
 
 if (window.self !== window.top) {
-  app.connect().then(update, (error) =>
+  app.connect().then(adoptContext, (error) =>
     console.warn("[mcp-app] connect failed (not running in an MCP host?):", error),
   );
 }
@@ -32,10 +55,14 @@ function subscribe(listener: () => void) {
   return () => listeners.delete(listener);
 }
 
-export function useHostContext() {
-  return useSyncExternalStore(subscribe, () => hostContext);
+export function useMcpApp() {
+  return useSyncExternalStore(subscribe, () => state);
 }
 
-export function requestDisplayMode(mode: "inline" | "fullscreen") {
-  return app.requestDisplayMode({ mode });
+export async function requestDisplayMode(mode: "inline" | "fullscreen") {
+  try {
+    await app.requestDisplayMode({ mode });
+  } catch (error) {
+    console.warn("[mcp-app] display mode request failed:", error);
+  }
 }

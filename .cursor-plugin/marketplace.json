@@ -1,0 +1,9 @@
+{
+  "name": "pia-pia-piano",
+  "plugins": [
+    {
+      "name": "pia-pia-piano",
+      "source": "plugins/pia-pia-piano"
+    }
+  ]
+}

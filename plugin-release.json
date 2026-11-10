@@ -1,0 +1,28 @@
+{
+  "plugin": "plugins/pia-pia-piano",
+  "versionFiles": [
+    "package.json",
+    "plugins/pia-pia-piano/.codex-plugin/plugin.json",
+    "plugins/pia-pia-piano/.cursor-plugin/plugin.json",
+    "plugins/pia-pia-piano/.claude-plugin/plugin.json"
+  ],
+  "archive": {
+    "name": "pia-pia-piano",
+    "exclude": [".cursor-plugin", ".claude-plugin"]
+  },
+  "production": {
+    "patch": {
+      "plugins/pia-pia-piano/.mcp.json": {
+        "mcpServers": { "piano": { "url": "https://pia-pia-piano.vercel.app/mcp" } }
+      },
+      "plugins/pia-pia-piano/.cursor-plugin/plugin.json": {
+        "displayName": "Pia Pia Piano",
+        "mcpServers": { "piano": { "url": "https://pia-pia-piano.vercel.app/mcp" } }
+      },
+      "plugins/pia-pia-piano/.codex-plugin/plugin.json": {
+        "interface": { "displayName": "Pia Pia Piano" }
+      }
+    },
+    "remove": []
+  }
+}

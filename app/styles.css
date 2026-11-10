@@ -1,0 +1,519 @@
+/*
+ * Two rules hold this page together.
+ *
+ * 1. --lit is the next key. It fills what you can press and nothing else: never
+ *    a surface, never decoration, never text. The widget uses the same colour
+ *    for the same job.
+ * 2. Everything else is the instrument's black and white on the grey of a
+ *    practice room. The keyboard under the navigation is the only ornament.
+ */
+
+:root {
+  --room: #edeff3;
+  --surface: #ffffff;
+  --ink: #121317;
+  --muted: #5d626c;
+  --hairline: #d5d9e0;
+  --lit: #ffc531;
+  --lit-ink: #121317;
+  --mark-tile: #121317;
+
+  --gutter: clamp(20px, 5vw, 56px);
+  --measure: 1120px;
+
+  color-scheme: light dark;
+  background: var(--room);
+  color: var(--ink);
+  font-family: var(--font-text), ui-sans-serif, system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --room: #0f1013;
+    --surface: #181a1f;
+    --ink: #eceef2;
+    --muted: #9a9fa9;
+    --hairline: #2a2d34;
+    --mark-tile: #2a2d34;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 0.2em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+code {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.88em;
+}
+
+.inner {
+  width: min(100%, var(--measure));
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+h1 {
+  max-width: 14ch;
+  margin: 0;
+  font-size: clamp(44px, 7.4vw, 92px);
+  font-variation-settings: "wdth" 85;
+}
+
+h2 {
+  max-width: 22ch;
+  margin: 0;
+  font-size: clamp(30px, 4vw, 46px);
+}
+
+h3 {
+  margin: 0 0 6px;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+}
+
+.lede {
+  max-width: 34em;
+  margin: 20px 0 0;
+  color: var(--muted);
+  font-size: clamp(18px, 1.8vw, 21px);
+  line-height: 1.55;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--lit);
+  color: var(--lit-ink);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.button.quiet {
+  border: 1px solid var(--hairline);
+  background: transparent;
+  color: var(--ink);
+}
+
+/* Navigation and the keybed beneath it. */
+
+.nav .inner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 68px;
+  font-size: 15px;
+}
+
+.nav a:not(.button) {
+  text-decoration: none;
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.wordmark svg {
+  width: 30px;
+  height: 30px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+/* A real keyboard is black and white in any light, so the keybed keeps its
+   colours in the dark scheme and only dims. */
+.keybed {
+  display: block;
+  width: 100%;
+  height: 28px;
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  background: #ffffff;
+}
+
+.keybed path {
+  stroke: #c7cbd3;
+}
+
+.keybed pattern rect {
+  fill: #121317;
+}
+
+@media (prefers-color-scheme: dark) {
+  .keybed {
+    border-color: #000000;
+    background: #d9dce2;
+  }
+
+  .keybed path {
+    stroke: #a9aeb8;
+  }
+}
+
+@media (max-width: 560px) {
+  .nav a:not(.button):not(.wordmark) {
+    display: none;
+  }
+}
+
+/* Hero: the headline, then the real piano in a mock conversation. */
+
+.hero {
+  padding: clamp(48px, 9vw, 104px) 0 56px;
+}
+
+.caption {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.window {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  margin-top: clamp(36px, 6vw, 64px);
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  border-radius: 16px;
+  background: var(--surface);
+  font-size: 15px;
+}
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 18px 12px;
+  border-right: 1px solid var(--hairline);
+}
+
+.rail .label {
+  padding: 0 10px 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.past {
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.past:hover {
+  color: var(--ink);
+}
+
+.past[aria-pressed="true"] {
+  background: var(--room);
+  color: var(--ink);
+}
+
+.pane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 24px clamp(16px, 3vw, 40px) 20px;
+}
+
+.thread {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.thread p {
+  margin: 0;
+}
+
+.said {
+  max-width: 80%;
+  margin-left: auto !important;
+  padding: 10px 16px;
+  border-radius: 18px;
+  background: var(--room);
+}
+
+.thread li:first-child {
+  display: flex;
+}
+
+.app {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 8px !important;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.app svg {
+  width: 20px;
+  height: 20px;
+}
+
+.card {
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+}
+
+.card[data-inactive] {
+  display: none;
+}
+
+.card iframe {
+  display: block;
+  width: 100%;
+  height: 340px;
+  border: 0;
+}
+
+.composer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 22px;
+  padding: 8px 8px 8px 18px;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  color: var(--muted);
+}
+
+.send {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+.send svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--surface);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (max-width: 760px) {
+  .window {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rail {
+    flex-direction: row;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 12px;
+    border-right: 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .rail .label {
+    display: none;
+  }
+
+  .past {
+    flex: none;
+  }
+}
+
+/* Bands below the hero. */
+
+.band {
+  padding: clamp(56px, 8vw, 96px) 0;
+  border-top: 1px solid var(--hairline);
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+  margin: 40px 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.steps li {
+  counter-increment: step;
+}
+
+.steps li::before {
+  content: counter(step);
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-bottom: 18px;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: var(--surface);
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+}
+
+.steps p,
+.ways p {
+  margin: 0;
+  color: var(--muted);
+}
+
+@media (max-width: 760px) {
+  .steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.ways {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 20px;
+  margin-top: 36px;
+}
+
+.ways article {
+  padding: 28px;
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.ways article:last-child {
+  background: transparent;
+}
+
+.address {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px !important;
+  padding: 12px 12px 12px 16px;
+  border-radius: 10px;
+  background: var(--room);
+  color: var(--ink) !important;
+}
+
+.address code {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+  .ways {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+footer {
+  padding: 36px 0 48px;
+  border-top: 1px solid var(--hairline);
+  color: var(--muted);
+  font-size: 14px;
+}
+
+footer p {
+  margin: 0;
+}
+
+.site-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 10px !important;
+  color: var(--ink);
+}
+
+/* Privacy, terms, and support. */
+
+.legal section {
+  width: min(100%, 720px);
+  margin: 0 auto;
+  padding: clamp(48px, 8vw, 88px) var(--gutter);
+}
+
+.legal h1 {
+  max-width: none;
+  font-size: clamp(36px, 5vw, 52px);
+}
+
+.legal h2 {
+  margin-top: 40px;
+  font-size: 24px;
+}
+
+.legal p {
+  margin: 12px 0 0;
+}
+
+.legal .updated {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.legal .back {
+  margin-top: 48px;
+}

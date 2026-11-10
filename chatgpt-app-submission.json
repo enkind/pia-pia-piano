@@ -1,0 +1,92 @@
+{
+  "$schema": "https://developers.openai.com/plugins/schemas/chatgpt-app-submission.v1.json",
+  "schema_version": 1,
+  "app_info": {
+    "display_name": "Pia Pia Piano",
+    "subtitle": "Play songs on a chat piano",
+    "description": "Ask how a song goes, and Pia Pia Piano opens a playable piano in the conversation with the melody lined up. The keyboard shows only the keys the song needs, the next key lights up, and it waits until you press it. A wrong key flashes red and the song waits, so anyone can play a tune at their own pace without reading music. Start over at any time. No account is required.",
+    "category": "EDUCATION"
+  },
+  "tools": {
+    "open_piano": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Validates the melody it is given and returns it for display. It stores nothing and changes no server-side data.",
+        "open_world_justification": "The tool only opens the local piano interface and does not contact public sites, external services, or other people.",
+        "destructive_justification": "Opening a piano does not delete, overwrite, publish, or perform any irreversible action."
+      }
+    }
+  },
+  "test_cases": [
+    {
+      "description": "Open a piano for a well-known children's song.",
+      "user_prompt": "How does Twinkle Twinkle Little Star go on piano?",
+      "file_attachment_urls": null,
+      "tools_triggered": "open_piano",
+      "expected_output": "A piano opens in the conversation titled Twinkle Twinkle Little Star, with the melody's notes and lyrics lined up and the first key, C4, lit. Pressing the lit key plays it and lights the next one. The agent does not repeat the notes as text.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Teach an instrumental melody without lyrics.",
+      "user_prompt": "Teach me the Ode to Joy melody on piano.",
+      "file_attachment_urls": null,
+      "tools_triggered": "open_piano",
+      "expected_output": "A piano opens with the Ode to Joy melody, written as single notes without chords, and the first key lit. A wrong key flashes red and the lit key stays where it is.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Play a short, simple song from a direct request.",
+      "user_prompt": "I want to play Mary Had a Little Lamb. Give me a piano.",
+      "file_attachment_urls": null,
+      "tools_triggered": "open_piano",
+      "expected_output": "A piano opens with Mary Had a Little Lamb, showing only the few keys the melody uses. After the last note, the piano says the song is finished and offers Play again.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Turn a request for written notes into a playable melody.",
+      "user_prompt": "What are the notes for Happy Birthday? I'd like to try playing it.",
+      "file_attachment_urls": null,
+      "tools_triggered": "open_piano",
+      "expected_output": "A piano opens with the Happy Birthday melody and its lyrics. The user can press Start over at any point to return to the first note.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Open a piano for a folk melody the user names.",
+      "user_prompt": "Can you set up Frère Jacques on a piano so I can learn it?",
+      "file_attachment_urls": null,
+      "tools_triggered": "open_piano",
+      "expected_output": "A piano opens with the Frère Jacques melody lined up and its lyric syllables under each note. The user plays it one key at a time at their own pace.",
+      "expected_output_url": null
+    }
+  ],
+  "negative_test_cases": [
+    {
+      "description": "Do not open a piano for a general music question.",
+      "user_prompt": "Who composed the Moonlight Sonata?",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "Answers that Beethoven composed it, without opening a piano.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Do not open a piano for music theory explanations.",
+      "user_prompt": "What is the difference between a major and a minor chord?",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "Explains the difference in text, without opening a piano, since the piano plays one melody note at a time.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Do not open a piano for requests unrelated to music.",
+      "user_prompt": "What is the capital of France?",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "Answers directly without opening a piano.",
+      "expected_output_url": null
+    }
+  ]
+}

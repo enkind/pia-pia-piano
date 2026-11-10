@@ -1,100 +1,316 @@
+/*
+ * One colour carries meaning on its own: --lit is the key to press next, on the
+ * keyboard and in the queue alike. --miss appears only for the moment a wrong
+ * key is down. Everything else is the instrument's own black and white.
+ */
+
+:root {
+  --ink: #16171b;
+  --muted: #6b6f78;
+  --line: #d9dce2;
+  --raised: #f2f3f5;
+  --key: #ffffff;
+  --key-down: #e3e5ea;
+  --key-edge: #c7cbd3;
+  --sharp: #1b1c20;
+  --sharp-down: #3a3c43;
+  --lit: #ffc531;
+  --lit-ink: #16171b;
+  --miss: #e5484d;
+  --miss-ink: #ffffff;
+
+  color-scheme: light;
+  color: var(--ink);
+  font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+:root[data-theme="dark"] {
+  --ink: #eceef2;
+  --muted: #9a9fa9;
+  --line: #31343b;
+  --raised: #24262c;
+  --key: #f4f5f7;
+  --key-down: #d4d7dd;
+  --key-edge: #2a2c32;
+  --sharp: #0e0f12;
+  --sharp-down: #34363d;
+  --miss: #ff5a5f;
+
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --ink: #eceef2;
+    --muted: #9a9fa9;
+    --line: #31343b;
+    --raised: #24262c;
+    --key: #f4f5f7;
+    --key-down: #d4d7dd;
+    --key-edge: #2a2c32;
+    --sharp: #0e0f12;
+    --sharp-down: #34363d;
+    --miss: #ff5a5f;
+
+    color-scheme: dark;
+  }
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font: 13px/1.4 system-ui, sans-serif;
-  color: #1c1b19;
   background: transparent;
 }
 
+button {
+  font: inherit;
+  color: inherit;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .piano {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   padding: 12px;
 }
 
-.piano header {
+/* Fullscreen hands the piano the whole pane, and the keys take what is left. */
+.piano[data-fullscreen] {
+  height: 100vh;
+}
+
+.notice {
+  margin: 0;
+  padding: 24px 4px;
+  color: var(--muted);
+  text-align: center;
+}
+
+header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
+  gap: 8px;
+  min-width: 0;
+}
+
+h1 {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.progress {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.control {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.control:hover:not(:disabled) {
+  background: var(--raised);
+}
+
+.control:disabled {
+  color: var(--muted);
+  cursor: default;
+  opacity: 0.6;
+}
+
+.control.icon {
+  width: 30px;
+  padding: 0;
+  justify-content: center;
+}
+
+.control svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* The queue: the note just played, then the one to play, then what follows. */
+
+.queue {
+  --chip: 48px;
+  --gap: 6px;
+
+  overflow: hidden;
+  mask-image: linear-gradient(to right, #000 85%, transparent);
+}
+
+.queue ol {
+  display: flex;
+  gap: var(--gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transform: translateX(calc(var(--at) * -1 * (var(--chip) + var(--gap))));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .queue ol {
+    transition: transform 160ms ease-out;
+  }
+}
+
+.queue li {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: var(--chip);
+  height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.queue li[data-state="played"] {
+  opacity: 0.35;
+}
+
+.queue li[data-state="next"] {
+  border-color: var(--lit);
+  background: var(--lit);
+  color: var(--lit-ink);
+}
+
+.pitch {
+  font-size: 14px;
   font-weight: 600;
 }
 
-.piano header button {
-  font: inherit;
-  padding: 4px 10px;
-  border: 1px solid #c9c6bf;
-  border-radius: 6px;
-  background: #fff;
-  cursor: pointer;
+.lyric {
+  max-width: 100%;
+  overflow: hidden;
+  padding: 0 4px;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+
+.finished {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 46px;
+  padding: 0 4px;
+}
+
+.finished p {
+  margin: 0;
+  font-weight: 600;
+}
+
+/* The keyboard. White keys share the width; each black key straddles the
+   boundary after the white key at --after. */
 
 .keys {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(var(--white-count), 1fr);
-  height: 180px;
+  grid-template-columns: repeat(var(--whites), 1fr);
+  height: clamp(140px, 30vw, 220px);
   touch-action: none;
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* No taller than about six key-widths, the proportion of a real key, and
+   centred in whatever height is left over. */
+.piano[data-fullscreen] .keys {
+  flex: 1;
+  height: auto;
+  min-height: 140px;
+  max-height: calc((100vw - 24px) / var(--whites) * 6);
+  margin-block: auto;
 }
 
 .keys button {
-  border: 0;
   padding: 0;
+  border: 0;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .white {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding-bottom: 8px !important;
-  background: #fbfaf7;
-  border: 1px solid #c9c6bf !important;
+  padding-bottom: 10px !important;
+  border: 1px solid var(--key-edge) !important;
   border-radius: 0 0 6px 6px;
-  color: #8a867d;
+  background: var(--key);
+  color: #8a8f99;
   font-size: 11px;
+}
+
+.white + .white {
+  border-left: 0 !important;
 }
 
 .black {
   position: absolute;
   top: 0;
-  width: calc(100% / var(--white-count) * 0.6);
-  height: 60%;
-  left: calc(100% / var(--white-count) * (var(--after) + 1) - 100% / var(--white-count) * 0.3);
-  background: #1c1b19;
+  left: calc(100% / var(--whites) * (var(--after) + 1) - 100% / var(--whites) * 0.31);
+  width: calc(100% / var(--whites) * 0.62);
+  height: 62%;
   border-radius: 0 0 4px 4px;
+  background: var(--sharp);
 }
 
-.white[data-pressed] {
-  background: #ffd76a;
+.white[data-down] {
+  background: var(--key-down);
 }
 
-.black[data-pressed] {
-  background: #b8860b;
+.black[data-down] {
+  background: var(--sharp-down);
 }
 
-dl {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px 16px;
-  margin: 12px 0 0;
-  font-size: 11px;
+.keys [data-target] {
+  background: var(--lit);
+  color: var(--lit-ink);
 }
 
-dl div {
-  display: flex;
-  gap: 6px;
-  min-width: 0;
-}
-
-dt {
-  color: #8a867d;
-  white-space: nowrap;
-}
-
-dd {
-  margin: 0;
-  overflow-wrap: anywhere;
+.keys [data-missed] {
+  background: var(--miss);
+  color: var(--miss-ink);
 }

@@ -2,7 +2,7 @@
   "mcpServers": {
     "piano": {
       "type": "http",
-      "url": "http://127.0.0.1:3200/mcp"
+      "url": "https://pia-pia-piano-dev.vercel.app/mcp"
     }
   }
 }

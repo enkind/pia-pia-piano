@@ -1,0 +1,5 @@
+interface:
+  display_name: "Pia Pia Piano"
+  short_description: "Play the song instead of reading its notes"
+  icon_small: "./assets/pia-pia-piano.svg"
+  icon_large: "./assets/pia-pia-piano.svg"

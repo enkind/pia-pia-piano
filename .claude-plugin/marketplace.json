@@ -1,0 +1,13 @@
+{
+  "name": "pia-pia-piano",
+  "owner": {
+    "name": "dzhunka"
+  },
+  "plugins": [
+    {
+      "name": "pia-pia-piano",
+      "source": "./plugins/pia-pia-piano",
+      "description": "A playable piano in the conversation, set up to teach one song: the next key lights up and waits for you."
+    }
+  ]
+}

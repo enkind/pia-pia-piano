@@ -1,139 +1,233 @@
-import { useEffect, useState } from "react";
-import { requestDisplayMode, useHostContext } from "./use-mcp-app";
+import { useEffect, useMemo, useReducer, useState } from "react";
+import type { McpUiHostContext } from "@modelcontextprotocol/ext-apps";
+import { HIGHEST, LOWEST, isBlack, midiOf, nameOf, songProblem, type Song } from "../lib/song";
+import { play } from "./sound";
+import { requestDisplayMode, useMcpApp } from "./use-mcp-app";
 
-const WHITE_KEYS = [
-  { midi: 60, name: "C4" },
-  { midi: 62, name: "D4" },
-  { midi: 64, name: "E4" },
-  { midi: 65, name: "F4" },
-  { midi: 67, name: "G4" },
-  { midi: 69, name: "A4" },
-  { midi: 71, name: "B4" },
-  { midi: 72, name: "C5" },
-];
-// Each black key sits on the boundary after the white key at `after`.
-const BLACK_KEYS = [
-  { midi: 61, name: "C#4", after: 0 },
-  { midi: 63, name: "D#4", after: 1 },
-  { midi: 66, name: "F#4", after: 3 },
-  { midi: 68, name: "G#4", after: 4 },
-  { midi: 70, name: "A#4", after: 5 },
-];
+const MIN_WHITE_KEYS = 8;
+const MISS_FLASH_MS = 450;
 
-// Created at load, before any gesture, so its first state tells us whether the
-// host's autoplay policy lets audio start unprompted.
-const audio = new AudioContext();
-const audioStateAtLoad = audio.state;
-
-function play(midi: number) {
-  const frequency = 440 * 2 ** ((midi - 69) / 12);
-  const start = audio.currentTime;
-  const end = start + 1.8;
-  const envelope = audio.createGain();
-  envelope.connect(audio.destination);
-  envelope.gain.setValueAtTime(0, start);
-  envelope.gain.linearRampToValueAtTime(0.35, start + 0.005);
-  envelope.gain.exponentialRampToValueAtTime(0.001, end);
-  for (const [ratio, level] of [[1, 1], [2, 0.4], [3, 0.15]]) {
-    const partial = audio.createGain();
-    partial.gain.value = level;
-    partial.connect(envelope);
-    const oscillator = audio.createOscillator();
-    oscillator.frequency.value = frequency * ratio;
-    oscillator.connect(partial);
-    oscillator.start(start);
-    oscillator.stop(end);
-  }
-}
+/** The pitch as the agent spelled it, so a song written in flats reads in flats. */
+const spell = (pitch: string) => pitch.trim().replace("#", "♯").replace(/b(?=\d)/, "♭");
 
 export function Widget() {
-  const context = useHostContext();
-  const [audioState, setAudioState] = useState(audio.state);
-  const [pressed, setPressed] = useState<number | null>(null);
-  const [notesPlayed, setNotesPlayed] = useState(0);
-  const [displayResult, setDisplayResult] = useState<string | null>(null);
+  const { context, song } = useMcpApp();
 
-  useEffect(() => {
-    const onChange = () => setAudioState(audio.state);
-    audio.addEventListener("statechange", onChange);
-    return () => audio.removeEventListener("statechange", onChange);
-  }, []);
-
-  async function press(midi: number) {
-    setPressed(midi);
-    if (audio.state !== "running") await audio.resume();
-    play(midi);
-    setNotesPlayed((count) => count + 1);
+  if (!song) {
+    return (
+      <main className="piano">
+        <p className="notice">Getting the song ready…</p>
+      </main>
+    );
   }
 
-  async function toggleFullscreen() {
-    const mode = context?.displayMode === "fullscreen" ? "inline" : "fullscreen";
-    try {
-      const result = await requestDisplayMode(mode);
-      setDisplayResult(`asked ${mode}, got ${result.mode}`);
-    } catch (error) {
-      setDisplayResult(`asked ${mode}, failed: ${String(error)}`);
-    }
+  const problem = song.notes.length === 0 ? "This song has no notes." : songProblem(song.notes);
+  if (problem) {
+    return (
+      <main className="piano">
+        <p className="notice">The piano can’t play this song. {problem}</p>
+      </main>
+    );
+  }
+
+  // A new song from the same frame starts from its first note.
+  return <Player key={JSON.stringify(song)} song={song} context={context} />;
+}
+
+/**
+ * The keys a song needs, widened to whole white keys at both ends and padded
+ * evenly around the melody to at least an octave, so a short tune still looks
+ * like a piano and every key stays wide enough to hit.
+ */
+function keyboardRange(midis: number[]): [number, number] {
+  let low = Math.min(...midis);
+  let high = Math.max(...midis);
+  if (isBlack(low)) low -= 1;
+  if (isBlack(high)) high += 1;
+
+  const whiteKeys = () => {
+    let count = 0;
+    for (let midi = low; midi <= high; midi++) if (!isBlack(midi)) count++;
+    return count;
+  };
+
+  for (let below = true; whiteKeys() < MIN_WHITE_KEYS; below = !below) {
+    if ((below && low > LOWEST) || high >= HIGHEST) low -= isBlack(low - 1) ? 2 : 1;
+    else high += isBlack(high + 1) ? 2 : 1;
+  }
+  return [low, high];
+}
+
+type Progress = { position: number; missed: number | null; misses: number };
+type Action = { type: "press"; midi: number } | { type: "clear"; misses: number } | { type: "restart" };
+
+const START: Progress = { position: 0, missed: null, misses: 0 };
+
+function Player({ song, context }: { song: Song; context?: McpUiHostContext }) {
+  const midis = useMemo(() => song.notes.map((note) => midiOf(note.pitch)!), [song]);
+  const [low, high] = useMemo(() => keyboardRange(midis), [midis]);
+  const [down, setDown] = useState<ReadonlySet<number>>(new Set());
+
+  // Judged against the state at the moment of each press, not the last render,
+  // so two keys pressed within one frame are still scored in order.
+  const [{ position, missed, misses }, dispatch] = useReducer(
+    (state: Progress, action: Action): Progress => {
+      switch (action.type) {
+        case "press":
+          if (state.position >= midis.length) return state;
+          if (action.midi === midis[state.position]) {
+            return { ...state, position: state.position + 1, missed: null };
+          }
+          return { ...state, missed: action.midi, misses: state.misses + 1 };
+        case "clear":
+          return action.misses === state.misses ? { ...state, missed: null } : state;
+        case "restart":
+          return { ...START, misses: state.misses };
+      }
+    },
+    START,
+  );
+
+  useEffect(() => {
+    if (missed === null) return;
+    const timer = window.setTimeout(() => dispatch({ type: "clear", misses }), MISS_FLASH_MS);
+    return () => window.clearTimeout(timer);
+  }, [missed, misses]);
+
+  const total = midis.length;
+  const done = position >= total;
+  const target = done ? null : midis[position];
+  const fullscreen = context?.displayMode === "fullscreen";
+  const canFullscreen = context?.availableDisplayModes?.includes("fullscreen") ?? false;
+
+  function press(midi: number) {
+    play(midi);
+    dispatch({ type: "press", midi });
+  }
+
+  const startOver = () => dispatch({ type: "restart" });
+
+  const release = (midi: number) =>
+    setDown((current) => {
+      if (!current.has(midi)) return current;
+      const next = new Set(current);
+      next.delete(midi);
+      return next;
+    });
+
+  const whites: number[] = [];
+  const blacks: { midi: number; after: number }[] = [];
+  for (let midi = low; midi <= high; midi++) {
+    if (isBlack(midi)) blacks.push({ midi, after: whites.length - 1 });
+    else whites.push(midi);
   }
 
   const keyProps = (midi: number) => ({
-    onPointerDown: (event: React.PointerEvent) => {
+    type: "button" as const,
+    "aria-label": nameOf(midi),
+    "data-target": midi === target || undefined,
+    "data-missed": midi === missed || undefined,
+    "data-down": down.has(midi) || undefined,
+    onPointerDown: (event: React.PointerEvent<HTMLButtonElement>) => {
       event.preventDefault();
-      void press(midi);
+      // Touch captures the pointer to the key it started on; releasing it lets
+      // a lifted finger end the press wherever it is.
+      if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+        event.currentTarget.releasePointerCapture(event.pointerId);
+      }
+      setDown((current) => new Set(current).add(midi));
+      press(midi);
     },
-    onPointerUp: () => setPressed(null),
-    onPointerLeave: () => setPressed(null),
-    "data-pressed": pressed === midi ? "" : undefined,
+    onPointerUp: () => release(midi),
+    onPointerCancel: () => release(midi),
+    onPointerLeave: () => release(midi),
+    onKeyDown: (event: React.KeyboardEvent) => {
+      if ((event.key === " " || event.key === "Enter") && !event.repeat) {
+        event.preventDefault();
+        press(midi);
+      }
+    },
   });
 
-  const diagnostics: [string, unknown][] = [
-    ["audio at load", audioStateAtLoad],
-    ["audio now", audioState],
-    ["notes played", notesPlayed],
-    ["display mode", context?.displayMode],
-    ["available modes", context?.availableDisplayModes],
-    ["platform", context?.platform],
-    ["device", context?.deviceCapabilities],
-    ["container", context?.containerDimensions],
-    ["user agent", context?.userAgent],
-    ["display request", displayResult],
-  ];
+  const upcoming = done
+    ? "Finished."
+    : `Next: ${spell(song.notes[position].pitch)}${song.notes[position].lyric ? `, “${song.notes[position].lyric}”` : ""}.`;
 
   return (
-    <main className="piano">
+    <main className="piano" data-fullscreen={fullscreen || undefined}>
       <header>
-        <span>Sound check: tap any key</span>
-        {context?.availableDisplayModes?.includes("fullscreen") && (
-          <button type="button" onClick={toggleFullscreen}>
-            {context.displayMode === "fullscreen" ? "Exit fullscreen" : "Fullscreen"}
+        <h1>{song.title}</h1>
+        <span className="progress">
+          {position} / {total}
+        </span>
+        <button type="button" className="control" onClick={startOver} disabled={position === 0}>
+          <svg viewBox="0 0 20 20" aria-hidden="true">
+            <path d="M4.5 10a5.5 5.5 0 1 0 1.6-3.9" />
+            <path d="M4.5 3.5v3h3" />
+          </svg>
+          Start over
+        </button>
+        {canFullscreen && (
+          <button
+            type="button"
+            className="control icon"
+            onClick={() => requestDisplayMode(fullscreen ? "inline" : "fullscreen")}
+            aria-label={fullscreen ? "Exit fullscreen" : "Fullscreen"}
+            title={fullscreen ? "Exit fullscreen" : "Fullscreen"}
+          >
+            <svg viewBox="0 0 20 20" aria-hidden="true">
+              {fullscreen ? (
+                <path d="M8 3.5V8H3.5M12 3.5V8h4.5M8 16.5V12H3.5M12 16.5V12h4.5" />
+              ) : (
+                <path d="M3.5 8V3.5H8M16.5 8V3.5H12M3.5 12v4.5H8M16.5 12v4.5H12" />
+              )}
+            </svg>
           </button>
         )}
       </header>
-      <div className="keys" style={{ "--white-count": WHITE_KEYS.length } as React.CSSProperties}>
-        {WHITE_KEYS.map((key) => (
-          <button key={key.midi} type="button" className="white" aria-label={key.name} {...keyProps(key.midi)}>
-            <span>{key.name}</span>
+
+      {done ? (
+        <div className="finished">
+          <p>You played all {total} notes.</p>
+          <button type="button" className="control" onClick={startOver}>
+            Play again
+          </button>
+        </div>
+      ) : (
+        <div className="queue" aria-hidden="true">
+          <ol style={{ "--at": Math.max(0, position - 1) } as React.CSSProperties}>
+            {song.notes.map((note, index) => (
+              <li
+                key={index}
+                data-state={index < position ? "played" : index === position ? "next" : undefined}
+              >
+                <span className="pitch">{spell(note.pitch)}</span>
+                {note.lyric && <span className="lyric">{note.lyric}</span>}
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+
+      <p className="sr-only" aria-live="polite">
+        {upcoming}
+      </p>
+
+      <div className="keys" style={{ "--whites": whites.length } as React.CSSProperties}>
+        {whites.map((midi) => (
+          <button key={midi} className="white" {...keyProps(midi)}>
+            <span>{midi % 12 === 0 ? nameOf(midi) : nameOf(midi).slice(0, 1)}</span>
           </button>
         ))}
-        {BLACK_KEYS.map((key) => (
+        {blacks.map(({ midi, after }) => (
           <button
-            key={key.midi}
-            type="button"
+            key={midi}
             className="black"
-            aria-label={key.name}
-            style={{ "--after": key.after } as React.CSSProperties}
-            {...keyProps(key.midi)}
+            style={{ "--after": after } as React.CSSProperties}
+            {...keyProps(midi)}
           />
         ))}
       </div>
-      <dl>
-        {diagnostics.map(([label, value]) => (
-          <div key={label}>
-            <dt>{label}</dt>
-            <dd>{value === undefined || value === null ? "—" : typeof value === "string" || typeof value === "number" ? value : JSON.stringify(value)}</dd>
-          </div>
-        ))}
-      </dl>
     </main>
   );
 }
