@@ -1,6 +1,6 @@
 {
   "name": "pia-pia-piano",
-  "version": "0.0.0",
+  "version": "1.0.0-dev.1",
   "description": "A playable piano in the conversation, set up to teach one song: the next key lights up and waits for you.",
   "author": {
     "name": "dzhunka"
@@ -8,5 +8,11 @@
   "homepage": "https://pia-pia-piano.vercel.app",
   "repository": "https://github.com/enkind/pia-pia-piano",
   "license": "MIT",
-  "keywords": ["mcp", "mcp-apps", "piano", "music", "learn"]
+  "keywords": [
+    "mcp",
+    "mcp-apps",
+    "piano",
+    "music",
+    "learn"
+  ]
 }

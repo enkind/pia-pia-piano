@@ -1,12 +1,18 @@
 {
   "name": "pia-pia-piano",
-  "version": "0.0.0",
+  "version": "1.0.0-dev.1",
   "description": "A playable piano in the conversation, set up to teach one song: the next key lights up and waits for you.",
   "author": {
     "name": "dzhunka"
   },
   "license": "MIT",
-  "keywords": ["mcp", "mcp-apps", "piano", "music", "learn"],
+  "keywords": [
+    "mcp",
+    "mcp-apps",
+    "piano",
+    "music",
+    "learn"
+  ],
   "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "interface": {
@@ -15,7 +21,9 @@
     "longDescription": "Ask how a song goes, and Pia Pia Piano opens a piano in the conversation with the melody lined up. The next key lights up and waits until you press it, so you can play the song at your own pace without reading music.",
     "developerName": "dzhunka",
     "category": "Productivity",
-    "capabilities": ["Piano"],
+    "capabilities": [
+      "Piano"
+    ],
     "defaultPrompt": [
       "How does Twinkle Twinkle Little Star go on piano?",
       "Teach me the Ode to Joy melody"

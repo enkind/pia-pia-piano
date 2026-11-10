@@ -1,7 +1,7 @@
 {
   "name": "pia-pia-piano",
   "displayName": "Pia Pia Piano (Dev)",
-  "version": "0.0.0",
+  "version": "1.0.0-dev.1",
   "description": "A playable piano in the conversation, set up to teach one song: the next key lights up and waits for you.",
   "logo": "./pia-pia-piano.svg",
   "skills": "./skills/",
