@@ -94,6 +94,10 @@ read, and the note name is a small hint beneath it. Boxed note names read as
 buttons sitting over the keys below them, and people playing along follow the
 lit key and the words rather than the names.
 
+The key after the lit one carries a faint wash of the same colour, and its dot
+in the queue a faint one, so the hand can move before it has to. When the next
+note repeats the lit one, the lit key shows a small dot instead.
+
 Presses are judged inside a reducer against the state at the moment of each
 press, not against the last render, so two keys pressed within one frame are
 still scored in order.

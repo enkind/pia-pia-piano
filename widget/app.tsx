@@ -99,6 +99,7 @@ function Player({ song, context }: { song: Song; context?: McpUiHostContext }) {
   const total = midis.length;
   const done = position >= total;
   const target = done ? null : midis[position];
+  const then = position + 1 < total ? midis[position + 1] : null;
   const fullscreen = context?.displayMode === "fullscreen";
   const canFullscreen = context?.availableDisplayModes?.includes("fullscreen") ?? false;
 
@@ -128,6 +129,7 @@ function Player({ song, context }: { song: Song; context?: McpUiHostContext }) {
     type: "button" as const,
     "aria-label": nameOf(midi),
     "data-target": midi === target || undefined,
+    "data-then": midi === then || undefined,
     "data-missed": midi === missed || undefined,
     "data-down": down.has(midi) || undefined,
     onPointerDown: (event: React.PointerEvent<HTMLButtonElement>) => {
@@ -207,7 +209,15 @@ function Player({ song, context }: { song: Song; context?: McpUiHostContext }) {
             {song.notes.map((note, index) => (
               <li
                 key={index}
-                data-state={index < position ? "played" : index === position ? "next" : undefined}
+                data-state={
+                  index < position
+                    ? "played"
+                    : index === position
+                      ? "next"
+                      : index === position + 1
+                        ? "then"
+                        : undefined
+                }
               >
                 <span
                   className="contour"
