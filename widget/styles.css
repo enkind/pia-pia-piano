@@ -19,6 +19,12 @@
   --miss: #e5484d;
   --miss-ink: #ffffff;
 
+  /* The lit key arrives at once; the hint for the note after it waits, so the
+     eye settles on what to press before learning what follows. Reduced motion
+     keeps the wait and drops the fades. */
+  --fade: 0ms;
+  --hint-delay: 300ms;
+
   color-scheme: light;
   color: var(--ink);
   font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -54,6 +60,12 @@
     --miss: #ff5a5f;
 
     color-scheme: dark;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root {
+    --fade: 160ms;
   }
 }
 
@@ -219,6 +231,9 @@ h1 {
   background: var(--muted);
   opacity: 0.55;
   transform: translate(-50%, 50%);
+  transition-property: width, height, background-color, opacity;
+  transition-duration: var(--fade);
+  transition-timing-function: ease-out;
 }
 
 [data-state="next"] .dot {
@@ -233,6 +248,8 @@ h1 {
   height: 10px;
   background: var(--lit);
   opacity: 0.45;
+  transition-duration: calc(var(--fade) * 2);
+  transition-delay: var(--hint-delay);
 }
 
 .lyric {
@@ -303,6 +320,7 @@ h1 {
   border: 0;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--fade) ease-out;
 }
 
 .white {
@@ -332,15 +350,19 @@ h1 {
   background: var(--sharp);
 }
 
+/* A pressed key answers at once and eases back when released. */
 .white[data-down] {
   background: var(--key-down);
+  transition-duration: 0s;
 }
 
 .black[data-down] {
   background: var(--sharp-down);
+  transition-duration: 0s;
 }
 
-/* The key after the lit one, washed with --lit so the hand can move early. */
+/* The key after the lit one, washed with --lit so the hand can move early.
+   It fades in only after the lit key has settled. */
 .white[data-then] {
   background: color-mix(in srgb, var(--lit) 28%, var(--key));
 }
@@ -349,12 +371,20 @@ h1 {
   background: color-mix(in srgb, var(--lit) 38%, var(--sharp));
 }
 
+.keys [data-then] {
+  transition-duration: calc(var(--fade) * 2);
+  transition-delay: var(--hint-delay);
+}
+
 .keys [data-target] {
   background: var(--lit);
   color: var(--lit-ink);
+  transition-duration: calc(var(--fade) / 2);
+  transition-delay: 0s;
 }
 
-/* A repeated note: the next key is this one again, so it gets a small dot. */
+/* A repeated note: the next key is this one again, so it gets a small dot,
+   on the same delay as the hint it stands in for. */
 .keys [data-target][data-then]::after {
   content: "";
   position: absolute;
@@ -366,13 +396,22 @@ h1 {
   background: var(--lit-ink);
   opacity: 0.45;
   transform: translateX(-50%);
+  animation: hint-in calc(var(--fade) * 2) ease-out var(--hint-delay) both;
 }
 
 .black[data-target][data-then]::after {
   bottom: 12px;
 }
 
+@keyframes hint-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* A miss is news, so it lands without a fade and eases out after. */
 .keys [data-missed] {
   background: var(--miss);
   color: var(--miss-ink);
+  transition: none;
 }

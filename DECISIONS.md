@@ -96,7 +96,11 @@ lit key and the words rather than the names.
 
 The key after the lit one carries a faint wash of the same colour, and its dot
 in the queue a faint one, so the hand can move before it has to. When the next
-note repeats the lit one, the lit key shows a small dot instead.
+note repeats the lit one, the lit key shows a small dot instead. The hint fades
+in 300ms after the lit key moves: arriving together, the two read as one
+instruction, and the eye has to work out which is first. The lit key comes on
+almost at once and a miss with no fade at all; reduced motion keeps the delay
+and drops the fades.
 
 Presses are judged inside a reducer against the state at the moment of each
 press, not against the last render, so two keys pressed within one frame are
