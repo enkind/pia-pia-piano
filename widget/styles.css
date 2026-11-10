@@ -165,11 +165,13 @@ h1 {
   outline-offset: 2px;
 }
 
-/* The queue: the note just played, then the one to play, then what follows. */
+/* The queue: the melody's contour, the note just played, then the one to play,
+   then what follows. Nothing in it has a border or a fill, because nothing in
+   it is pressed; only the dot to play next takes --lit, as its key does. */
 
 .queue {
-  --chip: 48px;
-  --gap: 6px;
+  --step: 42px;
+  --rise-range: 18px;
 
   overflow: hidden;
   mask-image: linear-gradient(to right, #000 85%, transparent);
@@ -177,11 +179,10 @@ h1 {
 
 .queue ol {
   display: flex;
-  gap: var(--gap);
   margin: 0;
   padding: 0;
   list-style: none;
-  transform: translateX(calc(var(--at) * -1 * (var(--chip) + var(--gap))));
+  transform: translateX(calc(var(--at) * -1 * var(--step)));
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -195,35 +196,61 @@ h1 {
   flex: none;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  width: var(--chip);
-  height: 46px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  width: var(--step);
 }
 
 .queue li[data-state="played"] {
-  opacity: 0.35;
+  opacity: 0.3;
 }
 
-.queue li[data-state="next"] {
-  border-color: var(--lit);
+.contour {
+  position: relative;
+  width: 100%;
+  height: calc(var(--rise-range) + 14px);
+}
+
+.dot {
+  position: absolute;
+  bottom: calc(var(--rise) * var(--rise-range) + 2px);
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+  opacity: 0.55;
+  transform: translate(-50%, 50%);
+}
+
+[data-state="next"] .dot {
+  width: 14px;
+  height: 14px;
   background: var(--lit);
-  color: var(--lit-ink);
-}
-
-.pitch {
-  font-size: 14px;
-  font-weight: 600;
+  opacity: 1;
 }
 
 .lyric {
   max-width: 100%;
+  min-height: 18px;
   overflow: hidden;
-  padding: 0 4px;
-  font-size: 11px;
+  color: var(--muted);
+  font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.queue ol:not([data-lyrics]) .lyric {
+  display: none;
+}
+
+[data-state="next"] .lyric {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.pitch {
+  color: var(--muted);
+  font-size: 10px;
+  opacity: 0.7;
 }
 
 .finished {
@@ -231,7 +258,7 @@ h1 {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  height: 46px;
+  min-height: 62px;
   padding: 0 4px;
 }
 

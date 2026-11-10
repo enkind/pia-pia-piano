@@ -88,6 +88,12 @@ every key stays wide enough to hit in an inline card, and refuses any pitch it
 cannot parse, both with a reason the agent can fix. `lib/song.ts` is the one
 definition of a playable song, used by both the server and the widget.
 
+The queue above the keyboard shows the melody's shape, not a row of labels:
+each note is a dot set as high as its pitch, the sung syllable is the line you
+read, and the note name is a small hint beneath it. Boxed note names read as
+buttons sitting over the keys below them, and people playing along follow the
+lit key and the words rather than the names.
+
 Presses are judged inside a reducer against the state at the moment of each
 press, not against the last render, so two keys pressed within one frame are
 still scored in order.

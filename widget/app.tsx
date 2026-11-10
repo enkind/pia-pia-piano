@@ -66,6 +66,8 @@ const START: Progress = { position: 0, missed: null, misses: 0 };
 function Player({ song, context }: { song: Song; context?: McpUiHostContext }) {
   const midis = useMemo(() => song.notes.map((note) => midiOf(note.pitch)!), [song]);
   const [low, high] = useMemo(() => keyboardRange(midis), [midis]);
+  const lowest = Math.min(...midis);
+  const span = Math.max(1, Math.max(...midis) - lowest);
   const [down, setDown] = useState<ReadonlySet<number>>(new Set());
 
   // Judged against the state at the moment of each press, not the last render,
@@ -194,15 +196,27 @@ function Player({ song, context }: { song: Song; context?: McpUiHostContext }) {
           </button>
         </div>
       ) : (
+        // The melody's shape rather than a row of labels: each note is a dot set
+        // as high as its pitch, with the sung syllable as the reading line and
+        // the note name only as a quiet hint, so nothing here looks pressable.
         <div className="queue" aria-hidden="true">
-          <ol style={{ "--at": Math.max(0, position - 1) } as React.CSSProperties}>
+          <ol
+            data-lyrics={song.notes.some((note) => note.lyric) || undefined}
+            style={{ "--at": Math.max(0, position - 1) } as React.CSSProperties}
+          >
             {song.notes.map((note, index) => (
               <li
                 key={index}
                 data-state={index < position ? "played" : index === position ? "next" : undefined}
               >
+                <span
+                  className="contour"
+                  style={{ "--rise": (midis[index] - lowest) / span } as React.CSSProperties}
+                >
+                  <span className="dot" />
+                </span>
+                <span className="lyric">{note.lyric}</span>
                 <span className="pitch">{spell(note.pitch)}</span>
-                {note.lyric && <span className="lyric">{note.lyric}</span>}
               </li>
             ))}
           </ol>
