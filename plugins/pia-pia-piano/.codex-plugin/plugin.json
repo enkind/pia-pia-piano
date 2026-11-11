@@ -1,6 +1,6 @@
 {
   "name": "pia-pia-piano",
-  "version": "1.0.1-dev.1",
+  "version": "1.0.1",
   "description": "A playable piano in the conversation, set up to teach one song: the next key lights up and waits for you.",
   "author": {
     "name": "dzhunka"
