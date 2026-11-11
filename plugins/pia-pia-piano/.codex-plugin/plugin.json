@@ -17,10 +17,10 @@
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "Pia Pia Piano (Dev)",
-    "shortDescription": "Play the song instead of reading its notes",
+    "shortDescription": "Play songs on a chat piano",
     "longDescription": "Ask how a song goes, and Pia Pia Piano opens a piano in the conversation with the melody lined up. The next key lights up and waits until you press it, so you can play the song at your own pace without reading music.",
     "developerName": "dzhunka",
-    "category": "Productivity",
+    "category": "Education & Research",
     "capabilities": [
       "Piano"
     ],
@@ -29,6 +29,7 @@
       "Teach me the Ode to Joy melody"
     ],
     "websiteURL": "https://pia-pia-piano.vercel.app",
+    "supportURL": "https://github.com/enkind/pia-pia-piano/issues",
     "privacyPolicyURL": "https://pia-pia-piano.vercel.app/privacy",
     "termsOfServiceURL": "https://pia-pia-piano.vercel.app/terms",
     "brandColor": "#121317",
