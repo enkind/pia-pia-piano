@@ -50,5 +50,7 @@ Markers: `[ ]` not started · `[x]` done · `[!]` needs the maintainer
 - [x] Review information saved: all supported countries, the demo video at
       <https://pia-pia-piano.vercel.app/demo.mp4> (recorded in Codex), and
       release notes
-- [!] Submit for review: the dialog asks for six attestations, which the
-      maintainer confirms
+- [x] Submitted 1.0.2 for review on 2026-11-11 (reference C-HEzNbf0UCeea),
+      with a private note that the plugin ships no song content. Until the
+      review closes, release nothing that changes tools, schemas,
+      instructions, or the widget.
