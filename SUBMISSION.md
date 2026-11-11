@@ -29,21 +29,26 @@ Markers: `[ ]` not started · `[x]` done · `[!]` needs the maintainer
 - [x] Skill `piano` with `agents/openai.yaml`
 - [x] `pnpm test:client` passes against the local server
 
-## Needs the maintainer
+## Release and hosting
 
-- [!] Create the public GitHub repository `enkind/pia-pia-piano` and push
-      `main`. Check commit authorship before making it public.
-- [!] Create two Vercel projects, `pia-pia-piano` and `pia-pia-piano-dev`, so
-      the hostnames match every manifest and page. Both returned 404 on
-      2026-11-10, so they appear unclaimed.
-- [!] GitHub environments `development` and `production`, each with
-      `VERCEL_TOKEN`, `VERCEL_PROJECT_ID`, and `MCP_URL`; `VERCEL_ORG_ID` as a
-      repository variable (see `enkind/.github` README).
-- [!] Create the `production` branch and an initial tag so semantic-release
-      has a starting point, then run the Release workflow.
-- [!] In the portal: verify the domain by setting `OPENAI_APPS_CHALLENGE` on
-      the production project and redeploying, run Scan Tools, import
-      `chatgpt-app-submission.json`, upload the release ZIP and both icons.
-- [!] Screenshots from a ChatGPT developer-mode render, not Codex or Cursor.
-- [ ] Probe production with `pnpm test:client https://pia-pia-piano.vercel.app`
-      before submitting.
+- [x] Public repository `enkind/pia-pia-piano`
+- [x] Vercel projects `pia-pia-piano` and `pia-pia-piano-dev`
+- [x] GitHub environments `development` and `production` with `VERCEL_TOKEN`,
+      `VERCEL_PROJECT_ID`, and `MCP_URL`; `VERCEL_ORG_ID` at repository level.
+      The CI token `pia-pia-piano-ci` expires on 2027-11-11.
+- [x] `production` branch and releases v1.0.0 through v1.0.2
+- [x] `pnpm test:client https://pia-pia-piano.vercel.app` passes (2026-11-11)
+
+## Portal
+
+- [x] Domain verified through `OPENAI_APPS_CHALLENGE` on the production project
+- [x] MCP server configured; Scan Tools finds `open_piano`
+- [x] Draft 1.0.2 uploaded from the release ZIP; metadata and skill checks
+      report no findings
+- [x] Test cases come from `extensions.com.openai.review` in
+      `plugin.json`; the portal imports them only from the uploaded ZIP
+- [x] Review information saved: all supported countries, the demo video at
+      <https://pia-pia-piano.vercel.app/demo.mp4> (recorded in Codex), and
+      release notes
+- [!] Submit for review: the dialog asks for six attestations, which the
+      maintainer confirms
