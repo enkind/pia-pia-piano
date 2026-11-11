@@ -16,7 +16,7 @@
   "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "interface": {
-    "displayName": "Pia Pia Piano (Dev)",
+    "displayName": "Pia Pia Piano",
     "shortDescription": "Play songs on a chat piano",
     "longDescription": "Ask how a song goes, and Pia Pia Piano opens a piano in the conversation with the melody lined up. The next key lights up and waits until you press it, so you can play the song at your own pace without reading music.",
     "developerName": "dzhunka",
