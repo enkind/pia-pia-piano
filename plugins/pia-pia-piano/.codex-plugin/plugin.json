@@ -36,5 +36,61 @@
     "composerIcon": "./pia-pia-piano.svg",
     "logo": "./pia-pia-piano.svg",
     "logoDark": "./pia-pia-piano-dark.svg"
+  },
+  "extensions": {
+    "com.openai": {
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Open a piano for a well-known children's song.",
+              "prompt": "How does Twinkle Twinkle Little Star go on piano?",
+              "tools_triggered": "open_piano",
+              "expected_behavior": "A piano opens in the conversation titled Twinkle Twinkle Little Star, with the melody's notes and lyrics lined up and the first key, C4, lit. Pressing the lit key plays it and lights the next one. The agent does not repeat the notes as text."
+            },
+            {
+              "description": "Teach an instrumental melody without lyrics.",
+              "prompt": "Teach me the Ode to Joy melody on piano.",
+              "tools_triggered": "open_piano",
+              "expected_behavior": "A piano opens with the Ode to Joy melody, written as single notes without chords, and the first key lit. A wrong key flashes red and the lit key stays where it is."
+            },
+            {
+              "description": "Play a short, simple song from a direct request.",
+              "prompt": "I want to play Mary Had a Little Lamb. Give me a piano.",
+              "tools_triggered": "open_piano",
+              "expected_behavior": "A piano opens with Mary Had a Little Lamb, showing only the few keys the melody uses. After the last note, the piano says the song is finished and offers Play again."
+            },
+            {
+              "description": "Turn a request for written notes into a playable melody.",
+              "prompt": "What are the notes for Happy Birthday? I'd like to try playing it.",
+              "tools_triggered": "open_piano",
+              "expected_behavior": "A piano opens with the Happy Birthday melody and its lyrics. The user can press Start over at any point to return to the first note."
+            },
+            {
+              "description": "Open a piano for a folk melody the user names.",
+              "prompt": "Can you set up Frère Jacques on a piano so I can learn it?",
+              "tools_triggered": "open_piano",
+              "expected_behavior": "A piano opens with the Frère Jacques melody lined up and its lyric syllables under each note. The user plays it one key at a time at their own pace."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Do not open a piano for a general music question. Expected: answers that Beethoven composed it, without opening a piano.",
+              "prompt": "Who composed the Moonlight Sonata?"
+            },
+            {
+              "description": "Do not open a piano for music theory explanations. Expected: explains the difference in text, since the piano plays one melody note at a time.",
+              "prompt": "What is the difference between a major and a minor chord?"
+            },
+            {
+              "description": "Do not open a piano for requests unrelated to music. Expected: answers directly without opening a piano.",
+              "prompt": "What is the capital of France?"
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "Pia Pia Piano is free. It does not sell products or process payments."
+      }
+    }
   }
 }
