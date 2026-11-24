@@ -61,6 +61,22 @@ the user plays every note.
 - Cursor or a mobile host offering fullscreen, or a mobile host where the
   keyboard cannot fit in portrait.
 
+### Amendment — 2026-11-24: iOS
+
+After the directory listing went live, the piano was reported silent on
+iPhone. That fits two WebKit rules the desktop hosts above don't have. For a
+touch, `pointerdown` is not a user activation; only `pointerup` and `touchend`
+are, so a context resumed only on key-down never starts. And Web Audio plays
+through the ambient audio session, which the silent switch mutes. The widget
+now also resumes the context on `pointerup`, and sets
+`navigator.audioSession.type = "playback"` where it exists, so the piano plays
+even with the silent switch on. This is not yet measured on a device.
+
+The fix ships under the approved resource URI (`UI_VERSION` stays `5`), which
+departs from the bump rule in `AGENTS.md`. A published listing may have frozen
+the tool's `resourceUri`, and the server serves only the current one, so
+bumping it could leave the piano with no widget at all.
+
 ## 002 — The user is the clock: a melody of pitches, no durations
 
 **Date:** 2026-11-10

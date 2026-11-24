@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useReducer, useState } from "react";
 import type { McpUiHostContext } from "@modelcontextprotocol/ext-apps";
 import { HIGHEST, LOWEST, isBlack, midiOf, nameOf, songProblem, type Song } from "../lib/song";
-import { play } from "./sound";
+import { play, unlock } from "./sound";
 import { requestDisplayMode, useMcpApp } from "./use-mcp-app";
 
 const MIN_WHITE_KEYS = 8;
@@ -142,7 +142,10 @@ function Player({ song, context }: { song: Song; context?: McpUiHostContext }) {
       setDown((current) => new Set(current).add(midi));
       press(midi);
     },
-    onPointerUp: () => release(midi),
+    onPointerUp: () => {
+      unlock();
+      release(midi);
+    },
     onPointerCancel: () => release(midi),
     onPointerLeave: () => release(midi),
     onKeyDown: (event: React.KeyboardEvent) => {

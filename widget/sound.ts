@@ -2,10 +2,25 @@
 // context is created on the first key press rather than at load.
 let audio: AudioContext | undefined;
 
+/**
+ * Creates and resumes the context. iOS counts a touch's pointerup, not its
+ * pointerdown, as the gesture that may start audio, so keys call this on both.
+ */
+export function unlock() {
+  if (!audio) {
+    // iOS routes Web Audio through the ambient session, which the silent
+    // switch mutes; a piano is the sound itself, so ask for playback.
+    const session = (navigator as { audioSession?: { type: string } }).audioSession;
+    if (session) session.type = "playback";
+    audio = new AudioContext();
+  }
+  if (audio.state !== "running") void audio.resume();
+  return audio;
+}
+
 /** A short piano-like tone: three partials under a struck-string envelope. */
 export function play(midi: number) {
-  audio ??= new AudioContext();
-  if (audio.state !== "running") void audio.resume();
+  const audio = unlock();
 
   const frequency = 440 * 2 ** ((midi - 69) / 12);
   const start = audio.currentTime;
