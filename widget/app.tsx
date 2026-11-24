@@ -6,6 +6,11 @@ import { requestDisplayMode, useMcpApp } from "./use-mcp-app";
 
 const MIN_WHITE_KEYS = 8;
 const MISS_FLASH_MS = 450;
+// iOS apps may leave the silent switch muting the piano (DECISIONS 001), and
+// nothing in the page can tell, so iPhones and iPads get a quiet hint.
+const IOS =
+  /iPhone|iPad|iPod/.test(navigator.userAgent) ||
+  (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
 
 /** The pitch as the agent spelled it, so a song written in flats reads in flats. */
 const spell = (pitch: string) => pitch.trim().replace("#", "♯").replace(/b(?=\d)/, "♭");
@@ -255,6 +260,8 @@ function Player({ song, context }: { song: Song; context?: McpUiHostContext }) {
           />
         ))}
       </div>
+
+      {IOS && <p className="hint">No sound? Turn off Silent mode.</p>}
     </main>
   );
 }

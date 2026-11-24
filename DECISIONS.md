@@ -78,7 +78,9 @@ it ignores `navigator.audioSession`. 1.0.4 also looped a silent WAV from a
 `data:` URI, since WebKit holds the playback session while a media element
 plays; measured in the app, the switch still muted the piano, so the clip was
 removed. In the ChatGPT iPhone app the silent switch mutes the piano, as it
-does most games, and nothing in the widget changes that.
+does most games, and nothing in the widget changes that. Since the page cannot
+tell when that happens, iPhones and iPads show a quiet line under the keys:
+"No sound? Turn off Silent mode."
 
 The fix ships under the approved resource URI (`UI_VERSION` stays `5`), which
 departs from the bump rule in `AGENTS.md`. A published listing may have frozen
