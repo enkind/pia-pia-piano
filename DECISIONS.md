@@ -70,7 +70,14 @@ are, so a context resumed only on key-down never starts. And Web Audio plays
 through the ambient audio session, which the silent switch mutes. The widget
 now also resumes the context on `pointerup`, and sets
 `navigator.audioSession.type = "playback"` where it exists, so the piano plays
-even with the silent switch on. This is not yet measured on a device.
+even with the silent switch on.
+
+Measured on an iPhone with 1.0.3: the piano sounds in the browser, and in the
+ChatGPT app with the ringer on, but the app stays silent on the silent switch;
+it ignores `navigator.audioSession`. WebKit holds the playback session while a
+media element plays, so the first key press also starts a looping half-second
+silent WAV from a `data:` URI. The clip is not yet measured in the app, and a
+host whose CSP refuses `data:` media would leave the switch muting the piano.
 
 The fix ships under the approved resource URI (`UI_VERSION` stays `5`), which
 departs from the bump rule in `AGENTS.md`. A published listing may have frozen
