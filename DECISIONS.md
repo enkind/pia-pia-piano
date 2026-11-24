@@ -74,10 +74,11 @@ even with the silent switch on.
 
 Measured on an iPhone with 1.0.3: the piano sounds in the browser, and in the
 ChatGPT app with the ringer on, but the app stays silent on the silent switch;
-it ignores `navigator.audioSession`. WebKit holds the playback session while a
-media element plays, so the first key press also starts a looping half-second
-silent WAV from a `data:` URI. The clip is not yet measured in the app, and a
-host whose CSP refuses `data:` media would leave the switch muting the piano.
+it ignores `navigator.audioSession`. 1.0.4 also looped a silent WAV from a
+`data:` URI, since WebKit holds the playback session while a media element
+plays; measured in the app, the switch still muted the piano, so the clip was
+removed. In the ChatGPT iPhone app the silent switch mutes the piano, as it
+does most games, and nothing in the widget changes that.
 
 The fix ships under the approved resource URI (`UI_VERSION` stays `5`), which
 departs from the bump rule in `AGENTS.md`. A published listing may have frozen

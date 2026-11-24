@@ -2,22 +2,6 @@
 // context is created on the first key press rather than at load.
 let audio: AudioContext | undefined;
 
-// Half a second of 8 kHz, 8-bit silence as a WAV data URI.
-const SAMPLES = 4000;
-const u16 = (n: number) => String.fromCharCode(n & 255, n >> 8);
-const u32 = (n: number) => u16(n & 65535) + u16(n >>> 16);
-const SILENCE =
-  "data:audio/wav;base64," +
-  btoa(
-    `RIFF${u32(36 + SAMPLES)}WAVEfmt ${u32(16)}${u16(1)}${u16(1)}${u32(8000)}${u32(8000)}${u16(1)}${u16(8)}` +
-      `data${u32(SAMPLES)}${"\x80".repeat(SAMPLES)}`,
-  );
-
-// While a media element plays, WebKit holds the playback audio session, which
-// the silent switch does not mute. The ChatGPT iPhone app ignores
-// navigator.audioSession, so a looping silent clip keeps the piano audible.
-let silence: HTMLAudioElement | undefined;
-
 /**
  * Creates and resumes the context. iOS counts a touch's pointerup, not its
  * pointerdown, as the gesture that may start audio, so keys call this on both.
@@ -31,11 +15,6 @@ export function unlock() {
     audio = new AudioContext();
   }
   if (audio.state !== "running") void audio.resume();
-  if (!silence) {
-    silence = new Audio(SILENCE);
-    silence.loop = true;
-  }
-  if (silence.paused) silence.play().catch(() => {});
   return audio;
 }
 
