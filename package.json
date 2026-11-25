@@ -1,6 +1,6 @@
 {
   "name": "pia-pia-piano",
-  "version": "1.0.8",
+  "version": "1.0.9-dev.1",
   "private": true,
   "type": "module",
   "scripts": {
