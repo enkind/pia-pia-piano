@@ -2,7 +2,7 @@
   "mcpServers": {
     "piano": {
       "type": "http",
-      "url": "https://pia-pia-piano-dev.vercel.app/mcp"
+      "url": "https://pia-pia-piano.vercel.app/mcp"
     }
   }
 }
