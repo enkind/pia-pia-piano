@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useReducer, useState } from "react";
 import type { McpUiHostContext } from "@modelcontextprotocol/ext-apps";
 import { HIGHEST, LOWEST, isBlack, midiOf, nameOf, songProblem, type Song } from "../lib/song";
+import { probe } from "./probe";
 import { play, unlock } from "./sound";
 import { requestDisplayMode, useMcpApp } from "./use-mcp-app";
 
@@ -74,6 +75,7 @@ function Player({ song, context }: { song: Song; context?: McpUiHostContext }) {
   const lowest = Math.min(...midis);
   const span = Math.max(1, Math.max(...midis) - lowest);
   const [down, setDown] = useState<ReadonlySet<number>>(new Set());
+  const [report, setReport] = useState<string>();
 
   // Judged against the state at the moment of each press, not the last render,
   // so two keys pressed within one frame are still scored in order.
@@ -148,7 +150,11 @@ function Player({ song, context }: { song: Song; context?: McpUiHostContext }) {
       press(midi);
     },
     onPointerUp: () => {
-      unlock();
+      const audio = unlock();
+      if (IOS && report === undefined) {
+        setReport("probing…");
+        void probe(audio).then(setReport);
+      }
       release(midi);
     },
     onPointerCancel: () => release(midi),
@@ -262,6 +268,7 @@ function Player({ song, context }: { song: Song; context?: McpUiHostContext }) {
       </div>
 
       {IOS && <p className="hint">No sound? Turn off Silent mode.</p>}
+      {report && <p className="hint">{report}</p>}
     </main>
   );
 }
