@@ -1,17 +1,11 @@
 import { useEffect, useMemo, useReducer, useState } from "react";
 import type { McpUiHostContext } from "@modelcontextprotocol/ext-apps";
 import { HIGHEST, LOWEST, isBlack, midiOf, nameOf, songProblem, type Song } from "../lib/song";
-import { probe } from "./probe";
 import { play, unlock } from "./sound";
 import { requestDisplayMode, useMcpApp } from "./use-mcp-app";
 
 const MIN_WHITE_KEYS = 8;
 const MISS_FLASH_MS = 450;
-// iOS apps may leave the silent switch muting the piano (DECISIONS 001), and
-// nothing in the page can tell, so iPhones and iPads get a quiet hint.
-const IOS =
-  /iPhone|iPad|iPod/.test(navigator.userAgent) ||
-  (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
 
 /** The pitch as the agent spelled it, so a song written in flats reads in flats. */
 const spell = (pitch: string) => pitch.trim().replace("#", "♯").replace(/b(?=\d)/, "♭");
@@ -75,7 +69,6 @@ function Player({ song, context }: { song: Song; context?: McpUiHostContext }) {
   const lowest = Math.min(...midis);
   const span = Math.max(1, Math.max(...midis) - lowest);
   const [down, setDown] = useState<ReadonlySet<number>>(new Set());
-  const [report, setReport] = useState<string>();
 
   // Judged against the state at the moment of each press, not the last render,
   // so two keys pressed within one frame are still scored in order.
@@ -150,11 +143,7 @@ function Player({ song, context }: { song: Song; context?: McpUiHostContext }) {
       press(midi);
     },
     onPointerUp: () => {
-      const audio = unlock();
-      if (IOS && report === undefined) {
-        setReport("probing…");
-        void probe(audio).then(setReport);
-      }
+      unlock();
       release(midi);
     },
     onPointerCancel: () => release(midi),
@@ -266,9 +255,6 @@ function Player({ song, context }: { song: Song; context?: McpUiHostContext }) {
           />
         ))}
       </div>
-
-      {IOS && <p className="hint">No sound? Turn off Silent mode.</p>}
-      {report && <p className="hint">{report}</p>}
     </main>
   );
 }

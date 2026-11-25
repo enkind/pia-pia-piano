@@ -1,20 +1,24 @@
 // Hosts only let audio start inside a user gesture (DECISIONS 001), so the
 // context is created on the first key press rather than at load.
 let audio: AudioContext | undefined;
+let hold: HTMLAudioElement | undefined;
 
 /**
  * Creates and resumes the context. iOS counts a touch's pointerup, not its
  * pointerdown, as the gesture that may start audio, so keys call this on both.
  */
 export function unlock() {
-  if (!audio) {
-    // iOS routes Web Audio through the ambient session, which the silent
-    // switch mutes; a piano is the sound itself, so ask for playback.
-    const session = (navigator as { audioSession?: { type: string } }).audioSession;
-    if (session) session.type = "playback";
+  if (!audio || !hold) {
     audio = new AudioContext();
+    // iOS plays Web Audio in the ambient session, which the silent switch
+    // mutes. A playing media element moves the page to the playback session,
+    // so an element plays an empty stream from the context. Unlike a clip, a
+    // stream loads no source for ChatGPT's media-src to refuse (DECISIONS 001).
+    hold = new Audio();
+    hold.srcObject = audio.createMediaStreamDestination().stream;
   }
   if (audio.state !== "running") void audio.resume();
+  if (hold.paused) hold.play().catch(() => {});
   return audio;
 }
 

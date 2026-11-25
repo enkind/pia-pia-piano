@@ -64,28 +64,39 @@ the user plays every note.
 ### Amendment — 2026-11-24: iOS
 
 After the directory listing went live, the piano was reported silent on
-iPhone. That fits two WebKit rules the desktop hosts above don't have. For a
-touch, `pointerdown` is not a user activation; only `pointerup` and `touchend`
-are, so a context resumed only on key-down never starts. And Web Audio plays
-through the ambient audio session, which the silent switch mutes. The widget
-now also resumes the context on `pointerup`, and sets
-`navigator.audioSession.type = "playback"` where it exists, so the piano plays
-even with the silent switch on.
+iPhone. Two WebKit rules the desktop hosts above don't have explain it.
 
-Measured on an iPhone with 1.0.3: the piano sounds in the browser, and in the
-ChatGPT app with the ringer on, but the app stays silent on the silent switch;
-it ignores `navigator.audioSession`. 1.0.4 also looped a silent WAV from a
-`data:` URI, since WebKit holds the playback session while a media element
-plays; measured in the app, the switch still muted the piano, so the clip was
-removed. In the ChatGPT iPhone app the silent switch mutes the piano, as it
-does most games, and nothing in the widget changes that. Since the page cannot
-tell when that happens, iPhones and iPads show a quiet line under the keys:
-"No sound? Turn off Silent mode."
+- For a touch, `pointerdown` is not a user activation; only `pointerup` and
+  `touchend` are. A context resumed only on key-down never starts, so keys
+  also resume it on `pointerup`.
+- Web Audio plays in the ambient audio session, which the silent switch
+  mutes. While a media element plays, WebKit moves the page to the playback
+  session instead.
+
+Measured in the ChatGPT iPhone app, through probes shown in the widget in
+1.0.6 and 1.0.7. The app frames the widget cross-origin in a web view.
+
+- `navigator.audioSession.type = "playback"` reads back `auto`: WebKit drops
+  it in a cross-origin frame without the `microphone` permission policy.
+- With the silent switch on, the context reports `interrupted`.
+- `<audio>` clips from `data:` and `blob:` URIs, 8-bit or 16-bit WAV, fail
+  with `MEDIA_ERR_SRC_NOT_SUPPORTED` and a `media-src` CSP violation. The
+  silent `data:` clip shipped in 1.0.4 therefore never played.
+- An `<audio>` element whose `srcObject` is a
+  `MediaStreamAudioDestinationNode` stream from the context plays. The
+  context then reports `running`, and the piano sounds on the silent switch.
+
+The first key press therefore starts such an element, with nothing connected
+to the stream, and it plays for as long as the widget lives. The cost is
+that, like any media playback on iOS, it pauses other audio, such as the
+user's music.
 
 The fix ships under the approved resource URI (`UI_VERSION` stays `5`), which
 departs from the bump rule in `AGENTS.md`. A published listing may have frozen
 the tool's `resourceUri`, and the server serves only the current one, so
-bumping it could leave the piano with no widget at all.
+bumping it could leave the piano with no widget at all. The cost is
+measured: the ChatGPT iPhone app kept showing the 1.0.6 widget for about 25
+minutes after 1.0.7 was deployed.
 
 ## 002 — The user is the clock: a melody of pitches, no durations
 
