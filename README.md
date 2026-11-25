@@ -24,7 +24,10 @@ noncommercial project. MIT licensed.
 
 ## Install
 
-Paste this into Codex, Cursor, or Claude Code, then start a new chat:
+In ChatGPT and Codex, add it from the
+[plugin directory](https://chatgpt.com/plugins/plugin_asdk_app_6af40474b1208191982676e0aa681aa7).
+
+Elsewhere, paste this into Cursor or Claude Code, then start a new chat:
 
 ```text
 Install the Pia Pia Piano plugin from the production branch of https://github.com/enkind/pia-pia-piano

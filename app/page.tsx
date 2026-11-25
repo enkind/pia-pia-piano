@@ -4,6 +4,8 @@ import { CopyButton } from "./copy-button";
 import { Mark } from "./mark";
 import "./styles.css";
 
+const LISTING_URL = "https://chatgpt.com/plugins/plugin_asdk_app_6af40474b1208191982676e0aa681aa7";
+
 const INSTALL_PROMPT =
   "Install the Pia Pia Piano plugin from the production branch of https://github.com/enkind/pia-pia-piano";
 
@@ -99,19 +101,21 @@ export default function Home() {
 
           <div className="ways">
             <article>
-              <h3>Ask your agent to install it</h3>
-              <p>Paste this into Codex, Cursor, or Claude Code, then start a new chat.</p>
-              <p className="address">
-                <code>{INSTALL_PROMPT}</code>
-                <CopyButton value={INSTALL_PROMPT} />
+              <h3>In ChatGPT and Codex</h3>
+              <p>Add it from the plugin directory, then start a new chat.</p>
+              <p className="action">
+                <a className="button" href={LISTING_URL}>
+                  Open in ChatGPT
+                </a>
               </p>
             </article>
 
             <article>
-              <h3>From your agent’s plugin directory</h3>
-              <p>
-                One-click install from the plugin directory in ChatGPT and Codex
-                is on its way.
+              <h3>In Cursor or Claude Code</h3>
+              <p>Paste this into your agent, then start a new chat.</p>
+              <p className="address">
+                <code>{INSTALL_PROMPT}</code>
+                <CopyButton value={INSTALL_PROMPT} />
               </p>
             </article>
           </div>

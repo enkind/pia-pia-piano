@@ -54,3 +54,6 @@ Markers: `[ ]` not started · `[x]` done · `[!]` needs the maintainer
       with a private note that the plugin ships no song content. Until the
       review closes, release nothing that changes tools, schemas,
       instructions, or the widget.
+- [x] Published; the listing is
+      <https://chatgpt.com/plugins/plugin_asdk_app_6af40474b1208191982676e0aa681aa7>,
+      linked from the site's install section
